@@ -3,12 +3,14 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { Grid } from '@material-ui/core';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 import { TextField, Button } from '@material-ui/core';
 import { CircularProgress } from '@material-ui/core';
-
 import { Paper, Box } from '@material-ui/core';
-
 import DogCard from './dogCard';
+
+import SearchIcon from '@material-ui/icons/Search';
+import FavoriteIcon from '@material-ui/icons/Favorite';
 
 const useStyles = makeStyles((theme) => ({
 	paper: {
@@ -21,21 +23,25 @@ const useStyles = makeStyles((theme) => ({
 	appTitle: {
 		textAlign: 'left',
 	},
-	searchBar: {
-		width: '100%',
+	input: {
+		width: '90%',
+		margin: 'auto',
 	},
+	textField: {},
 }));
 function MainContainer() {
 	const classes = useStyles();
 	const [dogsList, setDogsList] = useState(null);
 	const [favDogs, setFavDogs] = useState(() => {
-		const localData = localStorage.getItem('favs');
-		return localData ? localData : [];
+		const localData = localStorage.getItem('favoriteDogsArr');
+		return localData ? JSON.parse(localData) : [];
 	});
+	const [autData, setAutData] = useState([]);
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		getRandomBreeds();
+		getAutocompleteData();
 	}, []);
 
 	const getRandomBreeds = async () => {
@@ -45,37 +51,91 @@ function MainContainer() {
 				.then((res) => setDogsList(res.data.message));
 			setLoading(true);
 		} catch {
-			console.log('lapeor');
+			console.log('API error');
 		}
+	};
+	const getAutocompleteData = async () => {
+		let dataArr = [];
+		const data = await axios
+			.get('https://dog.ceo/api/breeds/list/all')
+			.then((res) => {
+				for (let item in res.data.message) {
+					dataArr.push(item);
+				}
+			});
+		setAutData(dataArr);
 	};
 
 	const searchBreed = async (breed) => {
 		if (breed) {
 			try {
 				const data = await axios
-					.get(`https://dog.ceo/api/breed/${breed}/images`)
+					.get(`https://dog.ceo/api/breed/${breed}/images/random/10`)
 					.then((res) => setDogsList(res.data.message));
 				setLoading(true);
 			} catch {
-				console.log('lapeor');
+				console.log('breed not found');
 			}
 		}
 	};
 
+	const HandleAutocomplete = () => {
+		return (
+			<div className={classes.input}>
+				<Autocomplete
+					disablePortal
+					id="breed-autocomplete"
+					getOptionLabel={(autData) => `${autData}`}
+					options={autData}
+					noOptionsText={'breed not found'}
+					renderInput={(params) => (
+						<div>
+							<TextField
+								style={{
+									width: '80%',
+								}}
+								variant="outlined"
+								{...params}
+								label="Buscar razas de perro"
+							/>
+							<Button
+								style={{
+									padding: 15,
+									paddingLeft: 30,
+									paddingRight: 30,
+								}}
+								variant="contained"
+								onClick={() => {
+									searchBreed(params.inputProps.value);
+									console.log(params.inputProps.value);
+								}}
+							>
+								<SearchIcon style={{ marginRight: 5 }} />
+								Buscar
+							</Button>
+						</div>
+					)}
+				/>
+			</div>
+		);
+	};
+
 	const handleFavorites = (data) => {
-		let localDogs = [];
-		if (localStorage.getItem(data, data)) {
-			localDogs = favDogs;
-			console.log('AAAAAA', localDogs);
-			localStorage.removeItem(data);
-			setFavDogs(localDogs.filter((element) => element !== data));
-			console.log('localDogs', localDogs);
+		let parseData = localStorage.getItem('favoriteDogsArr');
+		let localData = parseData ? JSON.parse(parseData) : [];
+		if (localData && localData.length > 0 && localData.includes(data)) {
+			//si ya se encuentra la imagen en favoritos, se borra del array del localStorage
+			localData = localData.filter((element) => element !== data);
+			localStorage.setItem('favoriteDogsArr', JSON.stringify(localData));
+			setFavDogs(localData);
 			return;
 		}
-		localStorage.setItem(data, data);
-		localDogs = localStorage.getItem(data);
-		setFavDogs([...favDogs, localDogs]);
+		//si la imagen no estaba en favoritos, se agrega a localStorage
+		localData.push(data);
+		localStorage.setItem('favoriteDogsArr', JSON.stringify(localData));
+		setFavDogs([...favDogs, data]);
 	};
+
 	const favState = (element) => {
 		if (favDogs.includes(element)) {
 			return true;
@@ -102,7 +162,21 @@ function MainContainer() {
 	function handleFavsCards() {
 		return (
 			<React.Fragment>
-				<p>favoritos</p>
+				<Box
+					style={{
+						display: 'flex',
+						paddingLeft: 10,
+						borderTop: 'solid',
+						borderColor: '#CACACA',
+						marginTop: 20,
+					}}
+				>
+					<FavoriteIcon
+						style={{ marginTop: 28, marginRight: 10, color: 'red' }}
+					/>
+					<h1>Favoritos</h1>
+				</Box>
+
 				<Grid container justifyContent="center" spacing={2}>
 					{favDogs.map((element) => (
 						<Grid key={element} item>
@@ -117,37 +191,19 @@ function MainContainer() {
 			</React.Fragment>
 		);
 	}
-	console.log('favsArr', favDogs);
 	return (
-		<div className="App">
+		<Box className="App">
 			<Paper className={classes.paper}>
 				<Box className={classes.appTitle}>
 					<h2>Razas de Perro</h2>
 				</Box>
-				<div>
-					<form className={classes.searchBar}>
-						<TextField
-							id="search-bar"
-							className="text"
-							label="buscar razas"
-							onInput={(e) => {
-								searchBreed(e.target.value);
-							}}
-							variant="outlined"
-							placeholder="Search..."
-							size="small"
-						/>
-						<Button type="submit" aria-label="search">
-							buscar
-						</Button>
-					</form>
-				</div>
-				<div>
+				<HandleAutocomplete />
+				<Box>
 					{loading ? handleDogCards(dogsList) : <CircularProgress />}
-				</div>
-				<div>{loading ? handleFavsCards() : <CircularProgress />}</div>
+				</Box>
+				<Box>{loading ? handleFavsCards() : <CircularProgress />}</Box>
 			</Paper>
-		</div>
+		</Box>
 	);
 }
 

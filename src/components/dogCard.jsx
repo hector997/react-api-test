@@ -30,23 +30,15 @@ const useStyles = makeStyles((theme) => ({
 //     return localData ? localData : [];
 // }
 
-const Card = ({ dogData, onFavorite }) => {
+const Card = ({ dogData, isFav, onFavorite }) => {
 	const classes = useStyles();
-	const [isFavorite, setIsFavorite] = useState(false);
-
-	const setFavorite = (e) => {
-		onFavorite(e);
-		setIsFavorite(!isFavorite);
-		console.log('favState', isFavorite);
-	};
-
 	return (
 		<React.Fragment>
 			<Paper className={classes.paper}>
 				<IconButton
 					className={classes.favIcon}
-					style={isFavorite ? { color: 'red' } : { color: '#F4F4F4' }}
-					onClick={() => setFavorite(dogData)}
+					style={isFav ? { color: 'red' } : { color: '#F4F4F4' }}
+					onClick={() => onFavorite(dogData)}
 				>
 					<FavoriteIcon></FavoriteIcon>
 				</IconButton>

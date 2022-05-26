@@ -28,7 +28,10 @@ const useStyles = makeStyles((theme) => ({
 function MainContainer() {
 	const classes = useStyles();
 	const [dogsList, setDogsList] = useState(null);
-	const [favDogs, setFavDogs] = useState([]);
+	const [favDogs, setFavDogs] = useState(() => {
+		const localData = localStorage.getItem('favs');
+		return localData ? localData : [];
+	});
 	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
@@ -59,21 +62,27 @@ function MainContainer() {
 		}
 	};
 
-	const addToFavorites = (data) => {
-		console.log('afa', data);
+	const handleFavorites = (data) => {
+		let localDogs = [];
 		if (localStorage.getItem(data, data)) {
-			console.log(data, 'is in favs');
+			localDogs = favDogs;
+			console.log('AAAAAA', localDogs);
 			localStorage.removeItem(data);
+			setFavDogs(localDogs.filter((element) => element !== data));
+			console.log('localDogs', localDogs);
 			return;
 		}
-		localStorage.setItem(data, JSON.stringify([data]));
-		const favouriteDogs = localStorage.getItem(data);
-		setFavDogs([...favDogs, favouriteDogs]);
-		console.log(favDogs);
+		localStorage.setItem(data, data);
+		localDogs = localStorage.getItem(data);
+		setFavDogs([...favDogs, localDogs]);
 	};
-
+	const favState = (element) => {
+		if (favDogs.includes(element)) {
+			return true;
+		}
+		return false;
+	};
 	function handleDogCards(dogsList) {
-		console.log('doglist', dogsList);
 		return (
 			<React.Fragment>
 				<Grid container justifyContent="center" spacing={2}>
@@ -81,7 +90,8 @@ function MainContainer() {
 						<Grid key={element} item>
 							<DogCard
 								dogData={element}
-								onFavorite={addToFavorites}
+								isFav={favState(element)}
+								onFavorite={handleFavorites}
 							/>
 						</Grid>
 					))}
@@ -90,24 +100,24 @@ function MainContainer() {
 		);
 	}
 	function handleFavsCards() {
-		const getFavorites = () => {};
 		return (
 			<React.Fragment>
 				<p>favoritos</p>
-				{/* <Grid container justifyContent="center" spacing={2}>
+				<Grid container justifyContent="center" spacing={2}>
 					{favDogs.map((element) => (
 						<Grid key={element} item>
 							<DogCard
 								dogData={element}
-								onFavorite={addToFavorites}
+								isFav={favState(element)}
+								onFavorite={handleFavorites}
 							/>
 						</Grid>
 					))}
-				</Grid> */}
+				</Grid>
 			</React.Fragment>
 		);
 	}
-
+	console.log('favsArr', favDogs);
 	return (
 		<div className="App">
 			<Paper className={classes.paper}>

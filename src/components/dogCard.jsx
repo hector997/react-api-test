@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
 		margin: 'auto',
 		marginTop: 10,
 		background: '#FAFAFA',
+		position: 'relative',
 	},
 	image: {
 		objectFit: 'cover',
@@ -20,15 +21,12 @@ const useStyles = makeStyles((theme) => ({
 	},
 	favIcon: {
 		position: 'absolute',
+		bottom: 0,
 	},
 	isFav: {
 		border: 'red',
 	},
 }));
-// () => {
-//     const localData = localStorage.getItem('fav');
-//     return localData ? localData : [];
-// }
 
 const Card = ({ dogData, isFav, onFavorite }) => {
 	const classes = useStyles();

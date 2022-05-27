@@ -220,7 +220,7 @@ function MainContainer() {
 		}
 	}
 	const SearchBar = () => {
-		//
+		// aca se renderiza la searchbar y todo lo del autocomplete
 		return (
 			<div className={classes.input}>
 				<Autocomplete

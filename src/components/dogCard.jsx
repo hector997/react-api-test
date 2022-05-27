@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Paper, IconButton } from '@material-ui/core';
 import FavoriteIcon from '@material-ui/icons/Favorite';
 import { makeStyles } from '@material-ui/core/styles';
@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
 		border: 'red',
 	},
 }));
-
+//dogCard
 const Card = ({ dogData, isFav, onFavorite }) => {
 	const classes = useStyles();
 	return (
@@ -47,11 +47,7 @@ const Card = ({ dogData, isFav, onFavorite }) => {
 				>
 					<FavoriteIcon></FavoriteIcon>
 				</IconButton>
-				<img
-					className={classes.image}
-					src={dogData}
-					alt="error al cargar"
-				></img>
+				<img className={classes.image} src={dogData} alt=""></img>
 			</Paper>
 		</React.Fragment>
 	);

@@ -12,16 +12,23 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: 10,
 		background: '#FAFAFA',
 		position: 'relative',
+		[theme.breakpoints.down('sm')]: {
+			width: 90,
+			height: 90,
+		},
 	},
 	image: {
 		objectFit: 'cover',
-		width: 260,
-		height: 260,
+		width: 'inherit',
+		height: 'inherit',
 		borderRadius: 4,
 	},
 	favIcon: {
 		position: 'absolute',
 		bottom: 0,
+		[theme.breakpoints.down('sm')]: {
+			zoom: 0.7,
+		},
 	},
 	isFav: {
 		border: 'red',

@@ -20,18 +20,27 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: 10,
 		padding: 50,
 		background: '#FAFAFA',
+		[theme.breakpoints.down('sm')]: {
+			maxWidth: '100%',
+			padding: 20,
+		},
 	},
 	container: {
 		width: '87%', //con este width quedan alineadas las cards con el resto de los componentes
 		margin: 'auto',
+		[theme.breakpoints.down('sm')]: {
+			width: '100%',
+		},
 	},
 	appTitle: {
 		textAlign: 'left',
 	},
 	input: {
 		margin: 'auto',
+		[theme.breakpoints.down('sm')]: {
+			zoom: 0.73,
+		},
 	},
-	textField: {},
 }));
 function MainContainer() {
 	const classes = useStyles();
